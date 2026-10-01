@@ -417,33 +417,60 @@ def ease(x):
 
 
 def main():
-    scenes = []
-    for i in range(8):                                    # giriş
-        scenes.append(scene_login(ease(i / 7)))
-    for i in range(10):                                   # yükleme
-        scenes.append(scene_upload(i / 9))
-    for i in range(9):                                    # arka plan
-        scenes.append(scene_background(i / 8))
-    for i in range(7):                                    # avatar güncellendi
-        scenes.append(scene_updated(i / 6))
-    for i in range(8):                                    # tıklama + modal
-        scenes.append(scene_click(i / 7))
-    for i in range(10):                                   # şifre ortaya çıkar
-        scenes.append(scene_reveal(i / 9))
-    for i in range(10):                                   # kapanış
-        scenes.append(scene_outro(min(1.0, i / 7)))
+    frames, durs = [], []
+
+    def add(frame, ms):
+        frames.append(frame)
+        durs.append(ms)
+
+    # 1 · giriş (10 kare x 150ms)
+    for i in range(10):
+        add(scene_login(ease(i / 9)), 150)
+
+    # 2 · yükleme (12 kare x 150ms)
+    for i in range(12):
+        add(scene_upload(i / 11), 150)
+
+    # 3 · arka plan matematiği — NORMAL hız (9 kare x 130ms)
+    for i in range(9):
+        add(scene_background(i / 8), 130)
+
+    # 4 · avatar güncellendi — yavaş + bekleme ("her şey normal" anı)
+    for i in range(9):
+        add(scene_updated(i / 8), 180)
+    add(scene_updated(1.0), 1000)
+
+    # 5 · tıklama + modal — yavaş + modalda kal
+    for i in range(10):
+        add(scene_click(i / 9), 190)
+    add(scene_click(1.0), 1100)
+
+    # 6 · ŞİFRE ORTAYA ÇIKIYOR — en yavaş kısım (AHA anı)
+    for i in range(14):
+        add(scene_reveal(i / 13), 260)
+    add(scene_reveal(0.75), 600)     # şifre vurgusu ekrana gelir
+    add(scene_reveal(1.0), 1500)     # tam liste ekranda kalır
+
+    # 7 · kapanış — uzun okuma süresi
+    for i in range(12):
+        add(scene_outro(min(1.0, i / 11)), 240)
+    add(scene_outro(1.0), 2000)      # döngü başlamadan önce nefes payı
 
     out_dir = Path(__file__).resolve().parents[1] / "screenshots"
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / "heif-heist-flow.gif"
 
-    pframes = [f.convert("P", palette=Image.ADAPTIVE, colors=160) for f in scenes]
+    pframes = [f.convert("P", palette=Image.ADAPTIVE, colors=160) for f in frames]
+    assert len(pframes) == len(durs)
     pframes[0].save(out, save_all=True, append_images=pframes[1:],
-                    duration=150, loop=0, optimize=True)
-    print(f"OK: {out}  ({len(pframes)} kare, {out.stat().st_size / 1024:.0f} KB)")
+                    duration=durs, loop=0, optimize=True)
+    total_s = sum(durs) / 1000
+    print(f"OK: {out}  ({len(pframes)} kare, {out.stat().st_size / 1024:.0f} KB, "
+          f"toplam ~{total_s:.1f} sn)")
 
-    for idx in (2, 9, 18, 27, 34, 43, 52, len(scenes) - 1):
-        scenes[idx].save(out_dir / f"_preview_{idx:02d}.png")
+    for idx in (0, 15, 25, 35, 45, 55, 62, len(frames) - 1):
+        if idx < len(frames):
+            frames[idx].save(out_dir / f"_preview_{idx:02d}.png")
 
 
 if __name__ == "__main__":
