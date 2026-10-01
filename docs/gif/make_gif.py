@@ -430,60 +430,39 @@ def ease(x):
 
 
 def main():
-    frames, durs = [], []
+    # HEDEF: toplam 60 saniye, her kareye esit sure.
+    # 150 kare x 400 ms = 60.0 sn. Sahne basina kare sayisi hikayenin
+    # agirligina gore dagitildi (sifre sahnesi en uzun: 34 kare = ~13.6 sn).
+    plan = [
+        (scene_login,      16, ease),   # 6.4 sn
+        (scene_upload,     24, None),    # 9.6 sn
+        (scene_background, 18, None),    # 7.2 sn (matematik)
+        (scene_updated,    16, None),    # 6.4 sn
+        (scene_click,      18, None),    # 7.2 sn
+        (scene_reveal,     34, None),    # 13.6 sn  <- AHA ani
+        (scene_outro,      24, None),    # 9.6 sn
+    ]
+    FRAME_MS = 400
 
-    def add(frame, ms):
-        frames.append(frame)
-        durs.append(ms)
-
-    # 1 · giriş (10 kare x 150ms)
-    for i in range(10):
-        add(scene_login(ease(i / 9)), 210)
-
-    # 2 · yükleme (12 kare x 150ms)
-    for i in range(12):
-        add(scene_upload(i / 11), 210)
-
-    # 3 · arka plan matematiği — NORMAL hız (9 kare x 130ms)
-    for i in range(9):
-        add(scene_background(i / 8), 180)
-
-    # 4 · avatar güncellendi — yavaş + bekleme ("her şey normal" anı)
-    for i in range(9):
-        add(scene_updated(i / 8), 250)
-    add(scene_updated(1.0), 1400)
-
-    # 5 · tıklama + modal — yavaş + modalda kal
-    for i in range(10):
-        add(scene_click(i / 9), 265)
-    add(scene_click(1.0), 1550)
-
-    # 6 · ŞİFRE ORTAYA ÇIKIYOR — en yavaş kısım (AHA anı)
-    for i in range(14):
-        add(scene_reveal(i / 13), 365)
-    add(scene_reveal(0.75), 850)     # şifre vurgusu ekrana gelir
-    add(scene_reveal(1.0), 2100)     # tam liste ekranda kalır
-
-    # 7 · kapanış — uzun okuma süresi
-    for i in range(12):
-        add(scene_outro(min(1.0, i / 11)), 335)
-    add(scene_outro(1.0), 2800)      # döngü başlamadan önce nefes payı
+    frames = []
+    for fn, count, easing in plan:
+        for i in range(count):
+            t = i / (count - 1)
+            if easing is not None:
+                t = easing(t)
+            frames.append(fn(t))
+    durs = [FRAME_MS] * len(frames)
+    assert len(frames) * FRAME_MS == 60000
 
     out_dir = Path(__file__).resolve().parents[1] / "screenshots"
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / "heif-heist-flow.gif"
 
     pframes = [f.convert("P", palette=Image.ADAPTIVE, colors=160) for f in frames]
-    assert len(pframes) == len(durs)
     pframes[0].save(out, save_all=True, append_images=pframes[1:],
                     duration=durs, loop=0, optimize=True)
-    total_s = sum(durs) / 1000
-    print(f"OK: {out}  ({len(pframes)} kare, {out.stat().st_size / 1024:.0f} KB, "
-          f"toplam ~{total_s:.1f} sn)")
-
-    for idx in (0, 15, 25, 35, 45, 55, 62, len(frames) - 1):
-        if idx < len(frames):
-            frames[idx].save(out_dir / f"_preview_{idx:02d}.png")
+    print(f"OK: {out}  ({len(pframes)} kare x {FRAME_MS} ms = "
+          f"{len(pframes) * FRAME_MS / 1000:.0f} sn, {out.stat().st_size / 1024:.0f} KB)")
 
 
 if __name__ == "__main__":
