@@ -1,3 +1,5 @@
 # Demo laboratuvarı yan dosyaları
 *.log
 .DS_Store
+.zcode/
+uploads/avatars/
