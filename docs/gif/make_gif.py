@@ -253,7 +253,7 @@ def scene_background(progress):
     x = BX0 + 10
     cw = 232
     for i, (title, lines, c, tag) in enumerate(steps):
-        appear = min(1.0, max(0.0, (progress - i * 0.22) * 3.5))
+        appear = min(1.0, max(0.35 if i == 0 else 0.0, (progress - i * 0.22) * 3.5))
         if appear <= 0:
             x += cw + 14
             continue
@@ -300,7 +300,11 @@ def scene_updated(progress):
     tx, ty = card[0] + 20, card[1] + 52
     d.rounded_rectangle([tx - 4, ty - 4, tx + 104, ty + 104], radius=6,
                         fill="#e4e6eb", outline=APPBORD)
-    noise_rect(d, tx, ty, 96, 96, 3, seed=115, coverage=min(1.0, progress * 1.4))
+    noise_rect(d, tx, ty, 96, 96, 3, seed=115, coverage=min(1.0, progress * 1.05))
+    if progress > 0.7:
+        pc = int(progress * 100) % 2
+        d.rounded_rectangle([tx - 3, ty - 3, tx + 99, ty + 99],
+                            outline=GREEN if pc else CYAN, width=2)
 
     d.text((tx + 130, ty + 6), "gunun-karesi.heic → avatar_1.bmp", font=font(15), fill=APPTXT)
     if progress > 0.35:
@@ -382,7 +386,7 @@ def scene_reveal(progress):
         ("API anahtarı  : FK-PROD-9f8a7b6c…", False),
         ("Yedek DB      : backup_svc:Bk!2026", False),
     ]
-    n = max(0, int(len(secrets) * min(1.0, progress * 1.35)))
+    n = max(1, int(1 + 3 * min(1.0, progress * 1.5)))
     y = panel[1] + 44
     for i in range(n):
         text, hot = secrets[i]
@@ -413,11 +417,13 @@ def scene_outro(progress):
     d.rounded_rectangle([250, 214, 620, 244], radius=6, fill="#3d1214", outline=RED, width=2)
     d.text((264, 220), "Şifre: Sup3rS3cret!2026", font=font(17, bold=True), fill=RED)
 
-    d.text((60, 390), "Gerçek olay: Meta (Facebook/Instagram), Eylül 2026 — ödül:", font=font(17), fill=DIM)
-    d.text((60, 414), "$115.000", font=font(40, bold=True), fill=GREEN)
-    d.text((60, 470), "github.com/Rollingzzzzz/heif-heist-lab", font=font(17, bold=True), fill=CYAN)
-    d.text((60, 470), "dene:  docker compose up -d --build   →   python exploit/heif_exploit.py",
+    d.text((60, 350), "Gerçek olay: Meta (Facebook/Instagram), Eylül 2026 — ödül:", font=font(17), fill=DIM)
+    d.text((60, 374), "$115.000", font=font(40, bold=True), fill=GREEN)
+    d.text((60, 436), "github.com/Rollingzzzzz/heif-heist-lab", font=font(17, bold=True), fill=CYAN)
+    d.text((60, 464), "dene:  docker compose up -d --build   →   python exploit/heif_exploit.py",
            font=font(15), fill=DIM)
+    if int(progress * 24) % 2 == 0:
+        d.rectangle([700, 464, 712, 478], fill=GREEN)
     footer(d, "Tek bir HEIC yükleme: sunucu belleği ifşa oldu — gerçekte RCE'ye kadar gitti.",
            "Meta bu hata sınıfına $115.000 ödedi · github.com/Rollingzzzzz/heif-heist-lab", GREEN)
 
@@ -460,7 +466,7 @@ def main():
 
     pframes = [f.convert("P", palette=Image.ADAPTIVE, colors=160) for f in frames]
     pframes[0].save(out, save_all=True, append_images=pframes[1:],
-                    duration=durs, loop=0, optimize=True)
+                    duration=durs, loop=0, optimize=False)
     print(f"OK: {out}  ({len(pframes)} kare x {FRAME_MS} ms = "
           f"{len(pframes) * FRAME_MS / 1000:.0f} sn, {out.stat().st_size / 1024:.0f} KB)")
 
