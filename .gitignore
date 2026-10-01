@@ -3,3 +3,4 @@
 .DS_Store
 .zcode/
 uploads/avatars/
+__pycache__/
