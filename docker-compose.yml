@@ -1,0 +1,43 @@
+# Feysbuk — Open File Zafiyeti Demo Laboratuvarı
+# Kullanım: docker compose up -d --build  →  http://localhost:8080
+services:
+  db:
+    image: mariadb:11
+    container_name: feysbuk_db
+    environment:
+      MYSQL_ROOT_PASSWORD: feysbuk_root_2026
+      MYSQL_DATABASE: feysbuk
+      MYSQL_USER: feysbuk
+      MYSQL_PASSWORD: feysbuk_db_pass
+    volumes:
+      - ./app/seed.sql:/docker-entrypoint-initdb.d/01-seed.sql:ro
+      - feysbuk_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    container_name: feysbuk_web
+    ports:
+      - "8080:80"
+    volumes:
+      # Uygulama kodu (host'tan mount — kod değişikliği rebuild gerektirmez)
+      - ./app/html:/var/www/html:ro
+      - ./app/includes:/var/www/includes:ro
+      - ./app/php.ini:/usr/local/etc/php/php.ini:ro
+      # Docroot DIŞINDAKİ dizinler:
+      - ./secret:/var/www/secret:ro   # korunan bölge (web'den doğrudan erişilemez)
+      - ./uploads:/var/www/uploads     # meşru ek dosyaları
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  feysbuk_db_data:

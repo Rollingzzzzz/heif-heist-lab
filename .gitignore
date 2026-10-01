@@ -1,0 +1,3 @@
+# Demo laboratuvarı yan dosyaları
+*.log
+.DS_Store

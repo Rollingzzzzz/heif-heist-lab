@@ -1,0 +1,9 @@
+2026 OKUDUGUM KITAPLAR (demo ek dosyasi)
+=========================================
+1. Simyaci — Paulo Coelho
+2. Tutunamayanlar — Oguz Atay
+3. Kara Kitap — Orhan Pamuk
+4. Dune — Frank Herbert
+5. Kucuk Prens — Antoine de Saint-Exupery
+Sıradaki: Yaban — Yakup Kadri Karaosmanoglu
+Not: Bu dosya /var/www/uploads altindaki MEŞRU bir ektir.

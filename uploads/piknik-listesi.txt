@@ -1,0 +1,9 @@
+HAFTA SONU PICNIK LISTESI (demo ek dosyasi)
+============================================
+- Sandalye + masa (katlanabilir)
+- Simit, peynir, zeytin, domates
+- Semaver + cay bardagi
+- Pique battaniyesi
+- Frisbee
+Katilimcilar: Ayse, Mehmet, Zeynep, Demo Kullanici
+Not: Bu dosya /var/www/uploads altindaki MEŞRU bir ektir.

@@ -1,0 +1,8 @@
+KAPADOKYA BALON TURU — REZERVASYON NOTLARI (demo ek dosyasi)
+=============================================================
+- Tarih: 12 Ekim, gun dogumu saati 05:30 bulusma
+- Firma: Gokyuzu Baloncilik (kurgusal)
+- Kisi basi ucret: 2.750 TL, kahvalti dahil
+- Getirilecekler: atki, eldiven, kamera
+- Iptal politikasi: 48 saat oncesine kadar ucretsiz
+Not: Bu dosya /var/www/uploads altindaki MEŞRU bir ektir.
