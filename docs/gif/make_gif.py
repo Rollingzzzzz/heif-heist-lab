@@ -71,8 +71,13 @@ def header(d, step, total, title, color=CYAN):
     d.text((20, 34), "heif-heist-lab", font=font(13), fill=DIM)
 
 
-def footer(d, text, color):
-    d.text((20, H - 34), text, font=font(15), fill=color)
+def footer(d, line1, line2, color=CYAN):
+    """Alt yorum şeridi: kalın çıkarım + açıklayıcı Türkçe satır."""
+    d.rectangle([0, H - 56, W, H], fill=PANEL)
+    d.line([0, H - 56, W, H - 56], fill=BORDER, width=1)
+    d.text((20, H - 50), line1, font=font(15, bold=True), fill=color)
+    if line2:
+        d.text((20, H - 26), line2, font=font(14), fill=TEXT)
 
 
 def browser(d, url):
@@ -169,7 +174,8 @@ def scene_login(progress):
     click = max(0.0, (progress - 0.75) / 0.25)
     cursor(d, mx, my, click)
 
-    footer(d, "Hiçbir özel yetkisi yok — test veritabanında admin değil.", CYAN)
+    footer(d, "Sıradan bir kullanıcı hesabına giriyor — hiçbir özel yetkisi yok.",
+           "Bu, gerçek sosyal ağı taklit eden İZOLE bir Docker laboratuvarıdır.", CYAN)
     return img
 
 
@@ -216,7 +222,8 @@ def scene_upload(progress):
     click = max(0.0, (progress - 0.55) / 0.2) if not uploading else 0.0
     cursor(d, mx, my, click)
 
-    footer(d, "Yükleme NORMAL görünüyor: «başarıyla dönüştürüldü».", CYAN)
+    footer(d, "Kullanıcı fotoğrafı HEIC (iPhone formatı) olarak yüklüyor.",
+           "Sunucu dosyayı KENDİSİ dönüştürüyor (libheif 1.17.6) — her şey normal görünüyor.", CYAN)
     return img
 
 
@@ -272,7 +279,8 @@ def scene_background(progress):
             d.line([ax0, ay, ax1, ay], fill=ORANGE, width=3)
             d.polygon([(ax1, ay - 5), (ax1 + 8, ay), (ax1, ay + 5)], fill=ORANGE)
 
-    footer(d, "Tek suçlu satır: memcpy uzunluğunu DOSYADAKİ VERİYLE karşılaştırmıyor.", ORANGE)
+    footer(d, "Dosya «96×96 = 9216 bayt'ım var» diyor, ama içinde sadece 96 bayt var.",
+           "libheif uzunluğu KONTROL ETMEDEN kopyalıyor → 9120 bayt KOMŞU BELLEKTEN okunuyor.", ORANGE)
     return img
 
 
@@ -302,7 +310,8 @@ def scene_updated(progress):
         d.text((tx + 130, ty + 90), "Kimse bir şey fark etmedi.", font=font(15), fill=APPDIM)
         d.text((tx + 130, ty + 114), "Ama bu ARTIK bir fotoğraf değil…", font=font(15, bold=True), fill=RED)
 
-    footer(d, "Avatar, sunucuda yeni üretilen avatar_1.bmp ile değişti.", GREEN)
+    footer(d, "Yükleme «başarılı»: profil fotoğrafı güncellendi, kimse bir şey fark etmedi.",
+           "Ama bu bir fotoğraf değil — sunucu belleğinin kopyası.", GREEN)
     return img
 
 
@@ -342,7 +351,8 @@ def scene_click(progress):
             d.line([sx, zy, sx, zy + 288], fill=CYAN, width=2)
     cursor(d, mx, my, click)
 
-    footer(d, "Görüntü büyütülüyor — piksellerin içinde BİR ŞEYLER yazıyor gibi…", CYAN)
+    footer(d, "Kullanıcı kendi profil fotoğrafına tıklayıp büyütüyor.",
+           "Piksellerin arasında DÜZENLİ bir şeyler yazıyor gibi…", CYAN)
     return img
 
 
@@ -386,7 +396,8 @@ def scene_reveal(progress):
     d.text((panel[0] + 16, panel[3] - 34), "← bunlar sunucunun RAM'inden geldi",
            font=font(13), fill=DIM)
 
-    footer(d, "Şifre, profil fotoğrafının GÖRSELİNİN içindeydi.", RED)
+    footer(d, "İşte AHA anı: pikseller çözülüyor — içinde YÖNETİCİ ŞİFRESİ var.",
+           "Sup3rS3cret!2026, sunucunun RAM'inden avatarın içine kopyalanmıştı.", RED)
     return img
 
 
@@ -405,8 +416,10 @@ def scene_outro(progress):
     d.text((60, 390), "Gerçek olay: Meta (Facebook/Instagram), Eylül 2026 — ödül:", font=font(17), fill=DIM)
     d.text((60, 414), "$115.000", font=font(40, bold=True), fill=GREEN)
     d.text((60, 470), "github.com/Rollingzzzzz/heif-heist-lab", font=font(17, bold=True), fill=CYAN)
-    d.text((60, 496), "dene:  docker compose up -d --build   →   python exploit/heif_exploit.py",
+    d.text((60, 470), "dene:  docker compose up -d --build   →   python exploit/heif_exploit.py",
            font=font(15), fill=DIM)
+    footer(d, "Tek bir HEIC yükleme: sunucu belleği ifşa oldu — gerçekte RCE'ye kadar gitti.",
+           "Meta bu hata sınıfına $115.000 ödedi · github.com/Rollingzzzzz/heif-heist-lab", GREEN)
 
     return img
 
@@ -425,36 +438,36 @@ def main():
 
     # 1 · giriş (10 kare x 150ms)
     for i in range(10):
-        add(scene_login(ease(i / 9)), 150)
+        add(scene_login(ease(i / 9)), 210)
 
     # 2 · yükleme (12 kare x 150ms)
     for i in range(12):
-        add(scene_upload(i / 11), 150)
+        add(scene_upload(i / 11), 210)
 
     # 3 · arka plan matematiği — NORMAL hız (9 kare x 130ms)
     for i in range(9):
-        add(scene_background(i / 8), 130)
+        add(scene_background(i / 8), 180)
 
     # 4 · avatar güncellendi — yavaş + bekleme ("her şey normal" anı)
     for i in range(9):
-        add(scene_updated(i / 8), 180)
-    add(scene_updated(1.0), 1000)
+        add(scene_updated(i / 8), 250)
+    add(scene_updated(1.0), 1400)
 
     # 5 · tıklama + modal — yavaş + modalda kal
     for i in range(10):
-        add(scene_click(i / 9), 190)
-    add(scene_click(1.0), 1100)
+        add(scene_click(i / 9), 265)
+    add(scene_click(1.0), 1550)
 
     # 6 · ŞİFRE ORTAYA ÇIKIYOR — en yavaş kısım (AHA anı)
     for i in range(14):
-        add(scene_reveal(i / 13), 260)
-    add(scene_reveal(0.75), 600)     # şifre vurgusu ekrana gelir
-    add(scene_reveal(1.0), 1500)     # tam liste ekranda kalır
+        add(scene_reveal(i / 13), 365)
+    add(scene_reveal(0.75), 850)     # şifre vurgusu ekrana gelir
+    add(scene_reveal(1.0), 2100)     # tam liste ekranda kalır
 
     # 7 · kapanış — uzun okuma süresi
     for i in range(12):
-        add(scene_outro(min(1.0, i / 11)), 240)
-    add(scene_outro(1.0), 2000)      # döngü başlamadan önce nefes payı
+        add(scene_outro(min(1.0, i / 11)), 335)
+    add(scene_outro(1.0), 2800)      # döngü başlamadan önce nefes payı
 
     out_dir = Path(__file__).resolve().parents[1] / "screenshots"
     out_dir.mkdir(parents=True, exist_ok=True)
